@@ -7,5 +7,5 @@ public class Customer {
     long id;
     String name;
     String password;
-    long balance;
+    double balance;
 }
