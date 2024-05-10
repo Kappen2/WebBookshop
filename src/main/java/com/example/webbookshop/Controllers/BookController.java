@@ -1,8 +1,7 @@
-package com.example.simplewebbshop.Controllers;
+package com.example.webbookshop.Controllers;
 
-import com.example.simplewebbshop.Models.Book;
-import com.example.simplewebbshop.Repositories.BookRepository;
-import jakarta.servlet.http.HttpServletRequest;
+import com.example.webbookshop.Models.Book;
+import com.example.webbookshop.Repositories.BookRepository;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

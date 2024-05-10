@@ -1,15 +1,12 @@
-package com.example.simplewebbshop;
+package com.example.webbookshop;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-
-import java.util.List;
-
 @SpringBootApplication
-public class SimpleWebbshopApplication {
+public class WebBookshopApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(SimpleWebbshopApplication.class, args);
+		SpringApplication.run(WebBookshopApplication.class, args);
 	}
 }

@@ -1,6 +1,6 @@
-package com.example.simplewebbshop.Repositories;
+package com.example.webbookshop.Repositories;
 
-import com.example.simplewebbshop.Models.Book;
+import com.example.webbookshop.Models.Book;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
