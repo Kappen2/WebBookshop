@@ -1,6 +1,5 @@
 package com.example.webbookshop.Models;
 
-import jakarta.annotation.PostConstruct;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;

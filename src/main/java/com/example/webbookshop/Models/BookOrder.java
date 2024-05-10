@@ -3,7 +3,6 @@ package com.example.webbookshop.Models;
 import jakarta.annotation.PostConstruct;
 import jakarta.persistence.*;
 import lombok.Data;
-import org.springframework.context.annotation.DependsOn;
 
 @Data
 @Entity
