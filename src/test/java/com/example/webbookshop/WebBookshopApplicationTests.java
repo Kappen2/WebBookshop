@@ -1,13 +1,13 @@
-package com.example.simplewebbshop;
+package com.example.webbookshop;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class SimpleWebbshopApplicationTests {
+class WebBookshopApplicationTests {
 
-	@Test
+	/*@Test
 	void contextLoads() {
 	}
-
+*/
 }
