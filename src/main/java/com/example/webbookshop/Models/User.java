@@ -1,5 +1,6 @@
 package com.example.webbookshop.Models;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -11,10 +12,11 @@ public class User {
     @Id
     @GeneratedValue
     int id;
-    String email;
+    @Column(unique = true)
+    String username;
     String password;
     String firstName;
     String lastName;
-    double balance;
+    Double balance;
     boolean adminAccess = false;
 }
