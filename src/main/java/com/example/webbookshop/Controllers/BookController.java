@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
-@RestController
+@RestController("/books")
 public class BookController {
 
     private final BookRepository repo;
@@ -17,12 +17,12 @@ public class BookController {
         this.repo = repo;
     }
 
-    @GetMapping("/books")
+    @GetMapping
     public List<Book> getAllBooks(){
         return repo.findAll();
     }
 
-    @GetMapping("/books/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<Book> findById(@PathVariable long id){
         Optional<Book> bookOptional = repo.findById(id);
         if(bookOptional.isPresent()){
@@ -33,20 +33,20 @@ public class BookController {
         }
     }
 
-    @GetMapping("/books/author/{author}")
+    @GetMapping("/author/{author}")
     public List<Book> findByAuthor(@PathVariable String author){
         return repo.findByAuthor(author);
     }
 
-    @GetMapping("/books/title/{title}")
+    @GetMapping("/title/{title}")
     public List<Book> findByTitle(@PathVariable String title){return repo.findByTitle(title);}
 
-    @PostMapping("/books/add")
+    @PostMapping("/add")
     public Book addBooks(@RequestBody Book b){
         return repo.save(b);
     }
 
-    @PatchMapping("/books/update/{id}")
+    @PatchMapping("/update/{id}")
     public ResponseEntity<Book> updateBook(@PathVariable long id, @RequestBody Book updatedBook){
         Optional<Book> bookOptional = repo.findById(id);
         if(bookOptional.isPresent()){
@@ -68,7 +68,7 @@ public class BookController {
     }
 
 
-    @DeleteMapping("/books/delete/{id}")
+    @DeleteMapping("/delete/{id}")
     public List<Book> deleteById(@PathVariable long id) {
         repo.deleteById(id);
         return repo.findAll();
