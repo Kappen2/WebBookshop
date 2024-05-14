@@ -83,16 +83,9 @@ public class BookController {
         }
     }
 
-
     @DeleteMapping("/delete/{id}")
     public List<Book> deleteById(@PathVariable Long id) {
         repo.deleteById(id);
         return repo.findAll();
     }
-    //Method for adding book to BookOrder
-    /*@RequestMapping("/books/buy/{id}")
-    public Optional<Book> buyById(@PathVariable long id) {
-        Optional<Book> book = repo.findById(id);
-        return book;
-    }*/
 }

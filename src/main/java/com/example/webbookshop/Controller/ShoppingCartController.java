@@ -23,6 +23,7 @@ public class ShoppingCartController {
         this.shoppingCartRepository = shoppingCartRepository;
         this.userRepository = userRepository;
     }
+
     @GetMapping
     public List<ShoppingCart> getShoppingCarts() {
         return shoppingCartRepository.findAll();
