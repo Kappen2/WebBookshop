@@ -1,9 +1,10 @@
-package com.example.webbookshop.Controllers;
+package com.example.webbookshop.Controller;
 
-import com.example.webbookshop.Models.ShoppingCart;
-import com.example.webbookshop.Models.User;
-import com.example.webbookshop.Repositories.ShoppingCartRepository;
-import com.example.webbookshop.Repositories.UserRepository;
+import com.example.webbookshop.DTO.ShoppingCartDTO;
+import com.example.webbookshop.Model.ShoppingCart;
+import com.example.webbookshop.Model.User;
+import com.example.webbookshop.Repository.ShoppingCartRepository;
+import com.example.webbookshop.Repository.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -51,23 +52,26 @@ public class ShoppingCartController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> addShoppingCart(@RequestParam Long userId) {
+    public ResponseEntity<?> addShoppingCart(@RequestBody ShoppingCartDTO shoppingCartDTO) {
         // Step 1: Validate if the specified user exists
-        Optional<User> userOptional = userRepository.findById(userId);
+        Optional<User> userOptional = userRepository.findById(shoppingCartDTO.getUserId());
         if (userOptional.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with ID " + userId + " not found.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with ID " + shoppingCartDTO.getUserId() + " not found.");
         }
 
         // Step 2: Check if the user already has a shopping cart
-        ResponseEntity<?> responseEntity = getShoppingCartByUserId(userId);
+        ResponseEntity<?> responseEntity = getShoppingCartByUserId(shoppingCartDTO.getUserId());
         if (responseEntity.getStatusCode() == HttpStatus.OK) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User with ID " + userId + " already has a shopping cart.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User with ID " + shoppingCartDTO.getUserId() + " already has a shopping cart.");
         }
 
         // Step 3: Create a new shopping cart linked to the user
         ShoppingCart shoppingCart = new ShoppingCart();
+        shoppingCart.setPrice(shoppingCartDTO.getPrice());
+
         User user = userOptional.get();
         shoppingCart.setUser(user);
+
         ShoppingCart savedShoppingCart = shoppingCartRepository.save(shoppingCart);
 
         // Return the created shopping cart
@@ -178,5 +182,4 @@ public class ShoppingCartController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Insufficient balance. You don't have enough money on your account.");
         }
     }
-
 }

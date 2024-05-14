@@ -1,4 +1,4 @@
-package com.example.webbookshop.Models;
+package com.example.webbookshop.Model;
 
 import jakarta.persistence.*;
 import lombok.Data;
@@ -9,7 +9,7 @@ public class BookOrder {
 
     @Id
     @GeneratedValue
-    int id;
+    Long id;
     @ManyToOne
     private Book book;
     @ManyToOne
