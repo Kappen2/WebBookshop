@@ -1,6 +1,8 @@
 package com.example.webbookshop.Controllers;
 
+import com.example.webbookshop.Models.ShoppingCart;
 import com.example.webbookshop.Models.User;
+import com.example.webbookshop.Repositories.ShoppingCartRepository;
 import com.example.webbookshop.Repositories.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,9 +16,11 @@ import java.util.Optional;
 public class UserController {
 
     private final UserRepository userRepository;
+    private final ShoppingCartRepository shoppingCartRepository;
 
-    public UserController(UserRepository userRepository) {
+    public UserController(UserRepository userRepository, ShoppingCartRepository shoppingCartRepository) {
         this.userRepository = userRepository;
+        this.shoppingCartRepository = shoppingCartRepository;
     }
 
     @GetMapping
@@ -31,10 +35,18 @@ public class UserController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<User> createUser(@RequestBody User user) {
+    public ResponseEntity<User> addUser(@RequestBody User user) {
+        // Save the user
         User savedUser = userRepository.save(user);
+
+        // Create a shopping cart tied to the user
+        ShoppingCart shoppingCart = new ShoppingCart();
+        shoppingCart.setUser(savedUser);
+        shoppingCartRepository.save(shoppingCart);
+
         return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
     }
+
 
     @PatchMapping("/update/{id}")
     public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User updatedUser) {
