@@ -1,4 +1,4 @@
-package com.example.webbookshop.Models;
+package com.example.webbookshop.Model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -10,8 +10,8 @@ import lombok.Data;
 public class Book {
     @Id
     @GeneratedValue
-    int id;
+    Long id;
     String title;
     String author;
-    double price;
+    Double price;
 }

@@ -1,7 +1,8 @@
-package com.example.webbookshop.Controllers;
+package com.example.webbookshop.Controller;
 
-import com.example.webbookshop.Models.Book;
-import com.example.webbookshop.Repositories.BookRepository;
+import com.example.webbookshop.DTO.BookDTO;
+import com.example.webbookshop.Model.Book;
+import com.example.webbookshop.Repository.BookRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,12 +43,27 @@ public class BookController {
     public List<Book> findByTitle(@PathVariable String title){return repo.findByTitle(title);}
 
     @PostMapping("/add")
-    public Book addBooks(@RequestBody Book b){
-        return repo.save(b);
+    public ResponseEntity<BookDTO> addBooks(@RequestBody BookDTO bookDTO){
+        // Convert BookDTO to Book entity
+        Book book = new Book();
+        book.setTitle(bookDTO.getTitle());
+        book.setAuthor(bookDTO.getAuthor());
+        book.setPrice(bookDTO.getPrice());
+
+        // Save the Book entity
+        Book savedBook = repo.save(book);
+
+        // Convert saved Book entity back to BookDTO and return
+        BookDTO savedBookDTO = new BookDTO();
+        savedBookDTO.setTitle(savedBook.getTitle());
+        savedBookDTO.setAuthor(savedBook.getAuthor());
+        savedBookDTO.setPrice(savedBook.getPrice());
+
+        return ResponseEntity.ok().body(savedBookDTO);
     }
 
     @PatchMapping("/update/{id}")
-    public ResponseEntity<Book> updateBook(@PathVariable long id, @RequestBody Book updatedBook){
+    public ResponseEntity<Book> updateBook(@PathVariable Long id, @RequestBody Book updatedBook){
         Optional<Book> bookOptional = repo.findById(id);
         if(bookOptional.isPresent()){
             Book book = bookOptional.get();
@@ -67,16 +83,9 @@ public class BookController {
         }
     }
 
-
     @DeleteMapping("/delete/{id}")
-    public List<Book> deleteById(@PathVariable long id) {
+    public List<Book> deleteById(@PathVariable Long id) {
         repo.deleteById(id);
         return repo.findAll();
     }
-    //Method for adding book to BookOrder
-    /*@RequestMapping("/books/buy/{id}")
-    public Optional<Book> buyById(@PathVariable long id) {
-        Optional<Book> book = repo.findById(id);
-        return book;
-    }*/
 }

@@ -1,9 +1,10 @@
-package com.example.webbookshop.Controllers;
+package com.example.webbookshop.Controller;
 
-import com.example.webbookshop.Models.ShoppingCart;
-import com.example.webbookshop.Models.User;
-import com.example.webbookshop.Repositories.ShoppingCartRepository;
-import com.example.webbookshop.Repositories.UserRepository;
+import com.example.webbookshop.DTO.ShoppingCartDTO;
+import com.example.webbookshop.Model.ShoppingCart;
+import com.example.webbookshop.Model.User;
+import com.example.webbookshop.Repository.ShoppingCartRepository;
+import com.example.webbookshop.Repository.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +23,7 @@ public class ShoppingCartController {
         this.shoppingCartRepository = shoppingCartRepository;
         this.userRepository = userRepository;
     }
+
     @GetMapping
     public List<ShoppingCart> getShoppingCarts() {
         return shoppingCartRepository.findAll();
@@ -51,45 +53,69 @@ public class ShoppingCartController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> addShoppingCart(@RequestParam Long userId) {
+    public ResponseEntity<?> addShoppingCart(@RequestBody ShoppingCartDTO shoppingCartDTO) {
         // Step 1: Validate if the specified user exists
-        Optional<User> userOptional = userRepository.findById(userId);
+        Optional<User> userOptional = userRepository.findById(shoppingCartDTO.getUserId());
         if (userOptional.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with ID " + userId + " not found.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with ID " + shoppingCartDTO.getUserId() + " not found.");
         }
 
         // Step 2: Check if the user already has a shopping cart
-        ResponseEntity<?> responseEntity = getShoppingCartByUserId(userId);
+        ResponseEntity<?> responseEntity = getShoppingCartByUserId(shoppingCartDTO.getUserId());
         if (responseEntity.getStatusCode() == HttpStatus.OK) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User with ID " + userId + " already has a shopping cart.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User with ID " + shoppingCartDTO.getUserId() + " already has a shopping cart.");
         }
 
         // Step 3: Create a new shopping cart linked to the user
         ShoppingCart shoppingCart = new ShoppingCart();
+
+        // Check if manual price is provided, otherwise calculate dynamically
+        if (shoppingCartDTO.getPrice() != null) {
+            shoppingCart.setPrice(shoppingCartDTO.getPrice());
+        } else {
+            Double totalPrice = shoppingCart.calculateTotalPrice();
+            if (totalPrice != null) {
+                shoppingCart.setPrice(totalPrice);
+            } else {
+                // Handle the case where totalPrice is null, perhaps log a warning or set a default value
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to calculate total price for the shopping cart.");
+            }
+        }
+
         User user = userOptional.get();
         shoppingCart.setUser(user);
+
         ShoppingCart savedShoppingCart = shoppingCartRepository.save(shoppingCart);
 
         // Return the created shopping cart
         return ResponseEntity.status(HttpStatus.CREATED).body(savedShoppingCart);
     }
 
+
+
+
+
     @PatchMapping("/update/{id}")
-    public ResponseEntity<?> updateShoppingCartPrice(@PathVariable Long id, @RequestParam double price) {
+    public ResponseEntity<?> updateShoppingCartPrice(@PathVariable Long id, @RequestParam(required = false) Double price) {
         // Step 1: Check if the shopping cart exists
         Optional<ShoppingCart> shoppingCartOptional = shoppingCartRepository.findById(id);
         if (shoppingCartOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Shopping cart with ID " + id + " not found.");
         }
 
-        // Step 2: Update the price of the shopping cart
+        // Step 2: Update the price of the shopping cart if provided
         ShoppingCart shoppingCart = shoppingCartOptional.get();
-        shoppingCart.setPrice(price);
+        if (price != null) {
+            shoppingCart.setPrice(price);
+        } else {
+            shoppingCart.setPrice(shoppingCart.calculateTotalPrice());
+        }
         ShoppingCart updatedShoppingCart = shoppingCartRepository.save(shoppingCart);
 
         // Return the updated shopping cart
         return ResponseEntity.ok(updatedShoppingCart);
     }
+
 
     @PatchMapping("/update/user/{userId}")
     public ResponseEntity<?> updateShoppingCartPriceByUserId(@PathVariable Long userId, @RequestParam double price) {
@@ -178,5 +204,4 @@ public class ShoppingCartController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Insufficient balance. You don't have enough money on your account.");
         }
     }
-
 }

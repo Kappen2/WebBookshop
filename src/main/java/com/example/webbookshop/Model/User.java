@@ -1,4 +1,4 @@
-package com.example.webbookshop.Models;
+package com.example.webbookshop.Model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -11,7 +11,7 @@ import lombok.Data;
 public class User {
     @Id
     @GeneratedValue
-    int id;
+    Long id;
     @Column(unique = true)
     String username;
     String password;

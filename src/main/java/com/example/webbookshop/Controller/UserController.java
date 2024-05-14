@@ -1,9 +1,10 @@
-package com.example.webbookshop.Controllers;
+package com.example.webbookshop.Controller;
 
-import com.example.webbookshop.Models.ShoppingCart;
-import com.example.webbookshop.Models.User;
-import com.example.webbookshop.Repositories.ShoppingCartRepository;
-import com.example.webbookshop.Repositories.UserRepository;
+import com.example.webbookshop.DTO.UserDTO;
+import com.example.webbookshop.Model.ShoppingCart;
+import com.example.webbookshop.Model.User;
+import com.example.webbookshop.Repository.ShoppingCartRepository;
+import com.example.webbookshop.Repository.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -35,7 +36,16 @@ public class UserController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<User> addUser(@RequestBody User user) {
+    public ResponseEntity<User> addUser(@RequestBody UserDTO userDTO) {
+        // Convert UserDTO to User entity
+        User user = new User();
+        user.setUsername(userDTO.getUsername());
+        user.setPassword(userDTO.getPassword());
+        user.setFirstName(userDTO.getFirstName());
+        user.setLastName(userDTO.getLastName());
+        user.setBalance(userDTO.getBalance());
+        user.setAdminAccess(userDTO.getAdminAccess());
+
         // Save the user
         User savedUser = userRepository.save(user);
 
@@ -49,29 +59,17 @@ public class UserController {
 
 
     @PatchMapping("/update/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User updatedUser) {
+    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody UserDTO updatedUserDTO) {
         Optional<User> userOptional = userRepository.findById(id);
         if (userOptional.isPresent()) {
             User user = userOptional.get();
-            if (updatedUser.getUsername() != null) {
-                user.setUsername(updatedUser.getUsername());
-            }
-            if (updatedUser.getPassword() != null) {
-                user.setPassword(updatedUser.getPassword());
-            }
-            if (updatedUser.getFirstName() != null) {
-                user.setFirstName(updatedUser.getFirstName());
-            }
-            if (updatedUser.getLastName() != null) {
-                user.setLastName(updatedUser.getLastName());
-            }
-            if (updatedUser.getBalance() != null) {
-                user.setBalance(updatedUser.getBalance());
-            }
-            // Update adminAccess if present in the updatedUser object
-            if (updatedUser.isAdminAccess() != user.isAdminAccess()) {
-                user.setAdminAccess(updatedUser.isAdminAccess());
-            }
+            user.setUsername(updatedUserDTO.getUsername());
+            user.setPassword(updatedUserDTO.getPassword());
+            user.setFirstName(updatedUserDTO.getFirstName());
+            user.setLastName(updatedUserDTO.getLastName());
+            user.setBalance(updatedUserDTO.getBalance());
+            user.setAdminAccess(updatedUserDTO.getAdminAccess());
+
             // Update other fields as needed
             User savedUser = userRepository.save(user);
             return ResponseEntity.ok(savedUser);
