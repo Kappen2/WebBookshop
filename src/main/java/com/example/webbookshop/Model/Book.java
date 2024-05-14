@@ -13,5 +13,5 @@ public class Book {
     Long id;
     String title;
     String author;
-    double price;
+    Double price;
 }

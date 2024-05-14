@@ -5,5 +5,5 @@ import lombok.Data;
 @Data
 public class ShoppingCartDTO {
     private Long userId;
-    private double price;
+    private Double price;
 }

@@ -1,18 +1,31 @@
 package com.example.webbookshop.Model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 import lombok.Data;
+
+import java.util.List;
 
 @Data
 @Entity
 public class ShoppingCart {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
-    double price;
+    Double price;
     @OneToOne
     private User user;
+
+    @OneToMany(mappedBy = "shoppingCart")
+    private List<BookOrder> bookOrders;
+
+    // Add this method to calculate the total price based on associated books
+    public Double calculateTotalPrice() {
+        Double totalPrice = 0.0;
+        if (bookOrders != null) {
+            for (BookOrder bookOrder : bookOrders) {
+                totalPrice += bookOrder.getBook().getPrice();
+            }
+        }
+        return totalPrice;
+    }
 }

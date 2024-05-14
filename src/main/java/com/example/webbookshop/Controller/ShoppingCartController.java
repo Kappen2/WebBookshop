@@ -68,7 +68,19 @@ public class ShoppingCartController {
 
         // Step 3: Create a new shopping cart linked to the user
         ShoppingCart shoppingCart = new ShoppingCart();
-        shoppingCart.setPrice(shoppingCartDTO.getPrice());
+
+        // Check if manual price is provided, otherwise calculate dynamically
+        if (shoppingCartDTO.getPrice() != null) {
+            shoppingCart.setPrice(shoppingCartDTO.getPrice());
+        } else {
+            Double totalPrice = shoppingCart.calculateTotalPrice();
+            if (totalPrice != null) {
+                shoppingCart.setPrice(totalPrice);
+            } else {
+                // Handle the case where totalPrice is null, perhaps log a warning or set a default value
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to calculate total price for the shopping cart.");
+            }
+        }
 
         User user = userOptional.get();
         shoppingCart.setUser(user);
@@ -79,22 +91,31 @@ public class ShoppingCartController {
         return ResponseEntity.status(HttpStatus.CREATED).body(savedShoppingCart);
     }
 
+
+
+
+
     @PatchMapping("/update/{id}")
-    public ResponseEntity<?> updateShoppingCartPrice(@PathVariable Long id, @RequestParam double price) {
+    public ResponseEntity<?> updateShoppingCartPrice(@PathVariable Long id, @RequestParam(required = false) Double price) {
         // Step 1: Check if the shopping cart exists
         Optional<ShoppingCart> shoppingCartOptional = shoppingCartRepository.findById(id);
         if (shoppingCartOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Shopping cart with ID " + id + " not found.");
         }
 
-        // Step 2: Update the price of the shopping cart
+        // Step 2: Update the price of the shopping cart if provided
         ShoppingCart shoppingCart = shoppingCartOptional.get();
-        shoppingCart.setPrice(price);
+        if (price != null) {
+            shoppingCart.setPrice(price);
+        } else {
+            shoppingCart.setPrice(shoppingCart.calculateTotalPrice());
+        }
         ShoppingCart updatedShoppingCart = shoppingCartRepository.save(shoppingCart);
 
         // Return the updated shopping cart
         return ResponseEntity.ok(updatedShoppingCart);
     }
+
 
     @PatchMapping("/update/user/{userId}")
     public ResponseEntity<?> updateShoppingCartPriceByUserId(@PathVariable Long userId, @RequestParam double price) {
