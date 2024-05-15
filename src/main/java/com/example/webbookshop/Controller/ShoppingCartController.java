@@ -1,8 +1,10 @@
 package com.example.webbookshop.Controller;
 
 import com.example.webbookshop.DTO.ShoppingCartDTO;
+import com.example.webbookshop.Model.BookOrder;
 import com.example.webbookshop.Model.ShoppingCart;
 import com.example.webbookshop.Model.User;
+import com.example.webbookshop.Repository.BookOrderRepository;
 import com.example.webbookshop.Repository.ShoppingCartRepository;
 import com.example.webbookshop.Repository.UserRepository;
 import org.springframework.http.HttpStatus;
@@ -18,10 +20,12 @@ public class ShoppingCartController {
 
     private final ShoppingCartRepository shoppingCartRepository;
     private final UserRepository userRepository;
+    private final BookOrderRepository bookOrderRepository;
 
-    public ShoppingCartController(ShoppingCartRepository shoppingCartRepository, UserRepository userRepository) {
+    public ShoppingCartController(ShoppingCartRepository shoppingCartRepository, UserRepository userRepository, BookOrderRepository bookOrderRepository) {
         this.shoppingCartRepository = shoppingCartRepository;
         this.userRepository = userRepository;
+        this.bookOrderRepository = bookOrderRepository;
     }
 
     @GetMapping
@@ -69,16 +73,19 @@ public class ShoppingCartController {
         // Step 3: Create a new shopping cart linked to the user
         ShoppingCart shoppingCart = new ShoppingCart();
 
-        // Check if manual price is provided, otherwise calculate dynamically
+        // Check if manual price is provided, otherwise calculate dynamically from associated book order
         if (shoppingCartDTO.getPrice() != null) {
             shoppingCart.setPrice(shoppingCartDTO.getPrice());
         } else {
-            Double totalPrice = shoppingCart.calculateTotalPrice();
-            if (totalPrice != null) {
-                shoppingCart.setPrice(totalPrice);
+            // If no manual price is provided, attempt to fetch the price from the associated book order,
+            // otherwise default value of 0 will be used
+            Optional<BookOrder> bookOrderOptional = bookOrderRepository.findById(shoppingCartDTO.getBookOrderId());
+            if (bookOrderOptional.isPresent()) {
+                BookOrder bookOrder = bookOrderOptional.get();
+                // Set shopping cart price to the price of the associated book
+                shoppingCart.setPrice(bookOrder.getBook().getPrice());
             } else {
-                // Handle the case where totalPrice is null, perhaps log a warning or set a default value
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to calculate total price for the shopping cart.");
+                // Default value of 0 will be used
             }
         }
 
@@ -90,10 +97,6 @@ public class ShoppingCartController {
         // Return the created shopping cart
         return ResponseEntity.status(HttpStatus.CREATED).body(savedShoppingCart);
     }
-
-
-
-
 
     @PatchMapping("/update/{id}")
     public ResponseEntity<?> updateShoppingCartPrice(@PathVariable Long id, @RequestParam(required = false) Double price) {
@@ -115,7 +118,6 @@ public class ShoppingCartController {
         // Return the updated shopping cart
         return ResponseEntity.ok(updatedShoppingCart);
     }
-
 
     @PatchMapping("/update/user/{userId}")
     public ResponseEntity<?> updateShoppingCartPriceByUserId(@PathVariable Long userId, @RequestParam double price) {

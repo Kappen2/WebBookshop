@@ -11,7 +11,8 @@ public class ShoppingCart {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
-    Double price;
+    @Column(nullable = false)
+    private Double price = 0.0; // Default value is 0
     @OneToOne
     private User user;
 

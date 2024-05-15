@@ -63,12 +63,24 @@ public class UserController {
         Optional<User> userOptional = userRepository.findById(id);
         if (userOptional.isPresent()) {
             User user = userOptional.get();
-            user.setUsername(updatedUserDTO.getUsername());
-            user.setPassword(updatedUserDTO.getPassword());
-            user.setFirstName(updatedUserDTO.getFirstName());
-            user.setLastName(updatedUserDTO.getLastName());
-            user.setBalance(updatedUserDTO.getBalance());
-            user.setAdminAccess(updatedUserDTO.getAdminAccess());
+            if (updatedUserDTO.getUsername() != null) {
+                user.setUsername(updatedUserDTO.getUsername());
+            }
+            if (updatedUserDTO.getPassword() != null) {
+                user.setPassword(updatedUserDTO.getPassword());
+            }
+            if (updatedUserDTO.getFirstName() != null) {
+                user.setFirstName(updatedUserDTO.getFirstName());
+            }
+            if (updatedUserDTO.getLastName() != null) {
+                user.setLastName(updatedUserDTO.getLastName());
+            }
+            if (updatedUserDTO.getBalance() != null) {
+                user.setBalance(updatedUserDTO.getBalance());
+            }
+            if (updatedUserDTO.getAdminAccess() != null) {
+                user.setAdminAccess(updatedUserDTO.getAdminAccess());
+            }
 
             // Update other fields as needed
             User savedUser = userRepository.save(user);
@@ -77,6 +89,7 @@ public class UserController {
             return ResponseEntity.notFound().build();
         }
     }
+
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {

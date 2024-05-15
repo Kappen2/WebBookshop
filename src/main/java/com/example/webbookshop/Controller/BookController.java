@@ -9,7 +9,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
-@RestController("/books")
+@RestController
+@RequestMapping("/books")
 public class BookController {
 
     private final BookRepository repo;
@@ -73,7 +74,7 @@ public class BookController {
             if(updatedBook.getAuthor() != null) {
                 book.setAuthor(updatedBook.getAuthor());
             }
-            if(updatedBook.getPrice() != 0.0) {
+            if(updatedBook.getPrice() != null) { // Check if price is not null
                 book.setPrice(updatedBook.getPrice());
             }
             repo.save(book);
@@ -82,6 +83,7 @@ public class BookController {
             return ResponseEntity.notFound().build();
         }
     }
+
 
     @DeleteMapping("/delete/{id}")
     public List<Book> deleteById(@PathVariable Long id) {
