@@ -8,7 +8,7 @@ import lombok.Data;
 public class BookOrder {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
     @ManyToOne
     private Book book;
