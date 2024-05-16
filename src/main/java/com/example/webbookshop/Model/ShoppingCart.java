@@ -1,8 +1,10 @@
 package com.example.webbookshop.Model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -16,8 +18,17 @@ public class ShoppingCart {
     @OneToOne
     private User user;
 
-    @OneToMany(mappedBy = "shoppingCart")
-    private List<BookOrder> bookOrders;
+    @OneToMany(mappedBy = "shoppingCart", cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private List<BookOrder> bookOrders = new ArrayList<>();
+
+    @Override
+    public String toString() {
+        return "ShoppingCart{" +
+                "id=" + id +
+                ", bookOrders=" + bookOrders.size() +
+                '}';
+    }
 
     // Add this method to calculate the total price based on associated books
     public Double calculateTotalPrice() {
