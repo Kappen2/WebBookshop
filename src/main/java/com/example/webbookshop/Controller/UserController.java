@@ -1,5 +1,6 @@
 package com.example.webbookshop.Controller;
 
+import com.example.webbookshop.DTO.LoginRequest;
 import com.example.webbookshop.DTO.UserDTO;
 import com.example.webbookshop.Model.ShoppingCart;
 import com.example.webbookshop.Model.User;
@@ -27,6 +28,21 @@ public class UserController {
     @GetMapping
     public List<User> getAllUsers() {
         return userRepository.findAll();
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<User> login(@RequestBody LoginRequest loginRequest) {
+        Optional<User> userOptional = userRepository.findByUsername(loginRequest.getUsername());
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            if (user.getPassword().equals(loginRequest.getPassword())) {
+                return ResponseEntity.ok(user);
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 
     @GetMapping("/{id}")

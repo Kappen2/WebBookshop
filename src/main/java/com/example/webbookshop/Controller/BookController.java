@@ -6,6 +6,7 @@ import com.example.webbookshop.Repository.BookRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,17 +45,38 @@ public class BookController {
     public List<Book> findByTitle(@PathVariable String title){return repo.findByTitle(title);}
 
     @PostMapping("/add")
-    public ResponseEntity<BookDTO> addBooks(@RequestBody BookDTO bookDTO){
-        // Convert BookDTO to Book entity
+    public ResponseEntity<List<BookDTO>> addBooks(@RequestBody List<BookDTO> bookDTOs){
+        List<BookDTO> savedBookDTOs = new ArrayList<>();
+        for (BookDTO bookDTO : bookDTOs) {
+            // Convert BookDTO to Book entity
+            Book book = new Book();
+            book.setTitle(bookDTO.getTitle());
+            book.setAuthor(bookDTO.getAuthor());
+            book.setPrice(bookDTO.getPrice());
+
+            // Save the Book entity
+            Book savedBook = repo.save(book);
+
+            // Convert saved Book entity back to BookDTO
+            BookDTO savedBookDTO = new BookDTO();
+            savedBookDTO.setTitle(savedBook.getTitle());
+            savedBookDTO.setAuthor(savedBook.getAuthor());
+            savedBookDTO.setPrice(savedBook.getPrice());
+
+            savedBookDTOs.add(savedBookDTO);
+        }
+        return ResponseEntity.ok().body(savedBookDTOs);
+    }
+
+    @PostMapping("/addSingle")
+    public ResponseEntity<BookDTO> addBook(@RequestBody BookDTO bookDTO) {
         Book book = new Book();
         book.setTitle(bookDTO.getTitle());
         book.setAuthor(bookDTO.getAuthor());
         book.setPrice(bookDTO.getPrice());
 
-        // Save the Book entity
         Book savedBook = repo.save(book);
 
-        // Convert saved Book entity back to BookDTO and return
         BookDTO savedBookDTO = new BookDTO();
         savedBookDTO.setTitle(savedBook.getTitle());
         savedBookDTO.setAuthor(savedBook.getAuthor());
@@ -62,6 +84,7 @@ public class BookController {
 
         return ResponseEntity.ok().body(savedBookDTO);
     }
+
 
     @PatchMapping("/update/{id}")
     public ResponseEntity<Book> updateBook(@PathVariable Long id, @RequestBody Book updatedBook){
